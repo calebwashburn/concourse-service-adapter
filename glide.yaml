@@ -1,0 +1,6 @@
+package: github.com/datianshi/concourse-service-adapter
+import:
+- package: github.com/pivotal-cf/on-demand-services-sdk
+  subpackages:
+  - bosh
+  - serviceadapter
