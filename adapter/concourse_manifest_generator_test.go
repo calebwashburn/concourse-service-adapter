@@ -162,6 +162,8 @@ var _ = Describe("Concourse Service Adapter", func() {
 			Expect(generateErr).NotTo(HaveOccurred())
 			Expect(generated.InstanceGroups[0].Name).To(Equal(adapter.WebInstanceName))
 			Expect(generated.InstanceGroups[0].Properties["external_url"]).To(Equal("https://some-instance-id.systemdomain.com"))
+			Expect(generated.InstanceGroups[0].Jobs[0].Name).To(Equal(adapter.AtcJobName))
+			Expect(generated.InstanceGroups[0].Jobs[1].Name).To(Equal(adapter.TsaJobName))
 		})
 
 		It("sets the concourse db tier instance group", func() {
@@ -178,7 +180,8 @@ var _ = Describe("Concourse Service Adapter", func() {
 			Expect(generateErr).NotTo(HaveOccurred())
 			Expect(generated.InstanceGroups[1].Name).To(Equal(adapter.DatabaseInstanceName))
 			databaseName := generated.InstanceGroups[1].Properties["databases"].([]map[interface{}]interface{})[0]["name"]
-			Expect(databaseName).To(Equal("*atc_db"))
+			Expect(databaseName).To(Equal("atc_db"))
+			Expect(generated.InstanceGroups[1].Jobs[0].Name).To(Equal(adapter.PostgresJobName))
 		})
 
 		It("sets the concourse worker tier instance group", func() {
@@ -200,6 +203,10 @@ var _ = Describe("Concourse Service Adapter", func() {
 
 			Expect(listener_network).To(Equal("tcp"))
 			Expect(listen_address).To(Equal("0.0.0.0:7777"))
+
+			Expect(generated.InstanceGroups[2].Jobs[0].Name).To(Equal(adapter.GroundCrewJobName))
+			Expect(generated.InstanceGroups[2].Jobs[1].Name).To(Equal(adapter.BaggageClaimJobName))
+			Expect(generated.InstanceGroups[2].Jobs[2].Name).To(Equal(adapter.GardenJobName))
 
 		})
 

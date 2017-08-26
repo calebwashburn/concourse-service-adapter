@@ -78,7 +78,7 @@ func (m ManifestGenerator) GenerateManifest(
 
 	webInstanceGroup := findInstanceGroup(plan, WebInstanceName)
 	webProperties := m.webInstanceProperties(serviceDeployment.DeploymentName, plan.Properties, requestParams.ArbitraryParams(), previousManifest)
-	webJobs, err := gatherJobs(serviceDeployment.Releases, AtcJobName)
+	webJobs, err := gatherJobs(serviceDeployment.Releases, AtcJobName, TsaJobName)
 	if err != nil {
 		return
 	}
@@ -115,7 +115,7 @@ func (m ManifestGenerator) GenerateManifest(
 
 	workerInstanceGroup := findInstanceGroup(plan, WorkerInstanceName)
 	workerProperties := m.workerInstanceProperties(serviceDeployment.DeploymentName, plan.Properties, requestParams.ArbitraryParams(), previousManifest)
-	workerJobs, err := gatherJobs(serviceDeployment.Releases, GardenJobName)
+	workerJobs, err := gatherJobs(serviceDeployment.Releases, GroundCrewJobName, BaggageClaimJobName, GardenJobName)
 	if err != nil {
 		return
 	}
@@ -155,12 +155,16 @@ func findInstanceGroup(plan serviceadapter.Plan, instanceGroupName string) *serv
 	return nil
 }
 
-func gatherJobs(releases serviceadapter.ServiceReleases, jobName string) ([]bosh.Job, error) {
-	release, err := findReleaseForJob(jobName, releases)
-	if err != nil {
-		return nil, err
+func gatherJobs(releases serviceadapter.ServiceReleases, jobNames ...string) ([]bosh.Job, error) {
+	jobs := []bosh.Job{}
+	for _, job := range jobNames {
+		release, err := findReleaseForJob(job, releases)
+		if err != nil {
+			return nil, err
+		}
+		jobs = append(jobs, bosh.Job{Name: job, Release: release.Name})
 	}
-	return []bosh.Job{{Name: jobName, Release: release.Name}}, nil
+	return jobs, nil
 }
 
 func findReleaseForJob(requiredJob string, releases serviceadapter.ServiceReleases) (serviceadapter.ServiceRelease, error) {
@@ -196,18 +200,22 @@ func (m ManifestGenerator) webInstanceProperties(deploymentName string, planProp
 		"external_url":        fmt.Sprintf("https://%s.%s", deploymentName, appDomain),
 		"basic_auth_username": "atc",
 		"basic_auth_password": "atc",
-		"postgresql_database": `&atc_db atc`,
+		"postgresql_database": generateDatabase(),
+	}
+}
+
+func generateDatabase() map[interface{}]interface{} {
+	return map[interface{}]interface{}{
+		"name":     "atc_db",
+		"role":     "atc",
+		"password": "atc",
 	}
 }
 
 func (m ManifestGenerator) dbInstanceProperties(deploymentName string, planProperties serviceadapter.Properties, arbitraryParams map[string]interface{}, previousManifest *bosh.BoshManifest) map[string]interface{} {
 	return map[string]interface{}{
 		"databases": []map[interface{}]interface{}{
-			map[interface{}]interface{}{
-				"name":     "*atc_db",
-				"role":     "atc",
-				"password": "atc",
-			},
+			generateDatabase(),
 		},
 	}
 }
