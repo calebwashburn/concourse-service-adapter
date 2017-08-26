@@ -11,36 +11,20 @@ type Binder struct {
 	StderrLogger *log.Logger
 }
 
+//CreateBinding Contract on cf bind-service
 func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams serviceadapter.RequestParameters) (serviceadapter.Binding, error) {
-	// redisHost, err := getRedisHost(deploymentTopology)
-	// if err != nil {
-	// 	b.StderrLogger.Println(err.Error())
-	// 	return serviceadapter.Binding{}, errors.New("")
-	// }
-	//
-	// return serviceadapter.Binding{
-	// 	Credentials: map[string]interface{}{
-	// 		"host":     redisHost,
-	// 		"port":     RedisServerPort,
-	// 		"password": redisPlanProperties(manifest)["password"].(string),
-	// 	},
-	// }, nil
-	return serviceadapter.Binding{}, nil
+	prop := manifest.InstanceGroups[0].Properties
+	return serviceadapter.Binding{
+		Credentials: map[string]interface{}{
+			"username": prop["basic_auth_username"],
+			"password": prop["basic_auth_password"],
+			"host":     prop["external_url"],
+		},
+	}, nil
+
 }
 
+//DeleteBinding Static credentials no neeed to do anything
 func (b Binder) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams serviceadapter.RequestParameters) error {
 	return nil
 }
-
-// func getRedisHost(deploymentTopology bosh.BoshVMs) (string, error) {
-// 	if len(deploymentTopology) != 1 {
-// 		return "", fmt.Errorf("expected 1 instance group in the Redis deployment, got %d", len(deploymentTopology))
-// 	}
-//
-// 	redisServerIPs := deploymentTopology["redis-server"]
-// 	if len(redisServerIPs) != 1 {
-// 		return "", fmt.Errorf("expected redis-server instance group to have only 1 instance, got %d", len(redisServerIPs))
-// 	}
-// 	return redisServerIPs[0], nil
-//
-// }

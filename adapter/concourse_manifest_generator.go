@@ -1,6 +1,8 @@
 package adapter
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"strings"
@@ -34,7 +36,8 @@ const (
 	GardenJobName = "garden"
 )
 
-// var CurrentPasswordGenerator = randomPasswordGenerator
+//CurrentPasswordGenerator Password Generator
+var CurrentPasswordGenerator = randomPasswordGenerator
 
 //ManifestGenerator Contract of OMB on manifest generator
 type ManifestGenerator struct {
@@ -76,8 +79,11 @@ func (m ManifestGenerator) GenerateManifest(
 		})
 	}
 
+	webPassword, _ := CurrentPasswordGenerator()
+	dbPassword, _ := CurrentPasswordGenerator()
+
 	webInstanceGroup := findInstanceGroup(plan, WebInstanceName)
-	webProperties := m.webInstanceProperties(serviceDeployment.DeploymentName, plan.Properties, requestParams.ArbitraryParams(), previousManifest)
+	webProperties := m.webInstanceProperties(dbPassword, webPassword, serviceDeployment.DeploymentName, plan.Properties, requestParams.ArbitraryParams(), previousManifest)
 	webJobs, err := gatherJobs(serviceDeployment.Releases, AtcJobName, TsaJobName)
 	if err != nil {
 		return
@@ -95,7 +101,7 @@ func (m ManifestGenerator) GenerateManifest(
 	})
 
 	dbInstanceGroup := findInstanceGroup(plan, DatabaseInstanceName)
-	dbProperties := m.dbInstanceProperties(serviceDeployment.DeploymentName, plan.Properties, requestParams.ArbitraryParams(), previousManifest)
+	dbProperties := m.dbInstanceProperties(dbPassword, serviceDeployment.DeploymentName, plan.Properties, requestParams.ArbitraryParams(), previousManifest)
 	dbJobs, err := gatherJobs(serviceDeployment.Releases, PostgresJobName)
 	if err != nil {
 		return
@@ -194,28 +200,28 @@ func findReleaseForJob(requiredJob string, releases serviceadapter.ServiceReleas
 	return releasesThatProvideRequiredJob[0], nil
 }
 
-func (m ManifestGenerator) webInstanceProperties(deploymentName string, planProperties serviceadapter.Properties, arbitraryParams map[string]interface{}, previousManifest *bosh.BoshManifest) map[string]interface{} {
+func (m ManifestGenerator) webInstanceProperties(dbPassword string, webPassword string, deploymentName string, planProperties serviceadapter.Properties, arbitraryParams map[string]interface{}, previousManifest *bosh.BoshManifest) map[string]interface{} {
 	appDomain := arbitraryParams["app_domain"]
 	return map[string]interface{}{
 		"external_url":        fmt.Sprintf("https://%s.%s", deploymentName, appDomain),
 		"basic_auth_username": "atc",
-		"basic_auth_password": "atc",
-		"postgresql_database": generateDatabase(),
+		"basic_auth_password": webPassword,
+		"postgresql_database": generateDatabase(dbPassword),
 	}
 }
 
-func generateDatabase() map[interface{}]interface{} {
+func generateDatabase(dbPassword string) map[interface{}]interface{} {
 	return map[interface{}]interface{}{
 		"name":     "atc_db",
 		"role":     "atc",
-		"password": "atc",
+		"password": dbPassword,
 	}
 }
 
-func (m ManifestGenerator) dbInstanceProperties(deploymentName string, planProperties serviceadapter.Properties, arbitraryParams map[string]interface{}, previousManifest *bosh.BoshManifest) map[string]interface{} {
+func (m ManifestGenerator) dbInstanceProperties(dbPassword string, deploymentName string, planProperties serviceadapter.Properties, arbitraryParams map[string]interface{}, previousManifest *bosh.BoshManifest) map[string]interface{} {
 	return map[string]interface{}{
 		"databases": []map[interface{}]interface{}{
-			generateDatabase(),
+			generateDatabase(dbPassword),
 		},
 	}
 }
@@ -254,4 +260,17 @@ func generateUpdateBlock(update *serviceadapter.Update, previousManifest *bosh.B
 	updateBlock.MaxInFlight = 1
 	return updateBlock
 
+}
+
+func randomPasswordGenerator() (string, error) {
+	length := 20
+	randomBytes := make([]byte, length)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		log.Printf("Error generating random bytes, %v", err)
+		return "", err
+	}
+	randomStringBytes := make([]byte, base64.StdEncoding.EncodedLen(len(randomBytes)))
+	base64.StdEncoding.Encode(randomStringBytes, randomBytes)
+	return string(randomStringBytes), nil
 }

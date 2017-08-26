@@ -21,10 +21,6 @@ var _ = Describe("Concourse Service Adapter", func() {
 
 	const ProvidedRedisServerInstanceGroupName = "redis-server"
 
-	// adapter.CurrentPasswordGenerator = func() (string, error) {
-	// 	return "really random password", nil
-	// }
-
 	var (
 		defaultServiceReleases   serviceadapter.ServiceReleases
 		defaultRequestParameters map[string]interface{}
@@ -210,6 +206,53 @@ var _ = Describe("Concourse Service Adapter", func() {
 
 		})
 
+	})
+
+	Describe("binding", func() {
+		var (
+			actualBinding    serviceadapter.Binding
+			actualBindingErr error
+			boshVMs          bosh.BoshVMs
+			currentManifest  bosh.BoshManifest
+		)
+		BeforeEach(func() {
+
+			boshVMs = bosh.BoshVMs{}
+			currentManifest = bosh.BoshManifest{
+				InstanceGroups: []bosh.InstanceGroup{
+					{
+						Properties: map[string]interface{}{
+							"basic_auth_username": "atc",
+							"basic_auth_password": "password",
+							"external_url":        "host",
+						},
+					},
+				},
+			}
+
+		})
+
+		JustBeforeEach(func() {
+			actualBinding, actualBindingErr = binder.CreateBinding("not-relevant", boshVMs, currentManifest, nil)
+		})
+
+		Context("has a password in the manifest", func() {
+			It("has no error", func() {
+				Expect(actualBindingErr).NotTo(HaveOccurred())
+			})
+
+			It("returns the username from the manifest", func() {
+				Expect(actualBinding.Credentials["username"]).To(Equal("atc"))
+			})
+
+			It("returns the password from the manifest", func() {
+				Expect(actualBinding.Credentials["password"]).To(Equal("password"))
+			})
+
+			It("returns the host from the vms", func() {
+				Expect(actualBinding.Credentials["host"]).To(Equal("host"))
+			})
+		})
 	})
 
 })
