@@ -7,6 +7,7 @@ import (
 	"github.com/pivotal-cf/on-demand-services-sdk/serviceadapter"
 )
 
+//Binder Implementation for binding contract
 type Binder struct {
 	StderrLogger *log.Logger
 }

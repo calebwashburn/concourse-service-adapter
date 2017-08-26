@@ -1,0 +1,132 @@
+broker:
+  port: 8080
+  username: admin
+  password: admin
+  disable_ssl_cert_verification: true
+  startup_banner: false
+bosh:
+  url: https://10.193.63.131:25555
+  root_ca_cert: |
+    -----BEGIN CERTIFICATE-----
+    MIIDDjCCAfagAwIBAgIUGop7sZOOI+IJwChNxt7x5knPf7MwDQYJKoZIhvcNAQEL
+    BQAwHzELMAkGA1UEBhMCVVMxEDAOBgNVBAoMB1Bpdm90YWwwHhcNMTcwODAxMDUw
+    NDEwWhcNMjEwODAyMDUwNDEwWjAfMQswCQYDVQQGEwJVUzEQMA4GA1UECgwHUGl2
+    b3RhbDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKHt0szaN0mNB7/m
+    PwyapFRq2CVJUwN9bOd6tXKjAdII+LCCvB3NZgNVWbMCccqU/e+FQ9/gx4+TmRHL
+    D4YWRIw+OvC/C4QsTYC0/3Qk4NydYE4WkvpXXZoceVL/Nvmvp6YVnv3NA+p4CdA7
+    PpNwE8eyYlkP9vbtzBXIvgDeere1VA+wqyyOJpbMvieT/6zBal4oE7fXq9cXiJbT
+    uiOYT6tmx/cx5QfO8BkpQpVlGQ0Na1CSxY7Ks8LPFLwBEvbfiXDR3Eiwk8Cj4hRS
+    SE1N40KyWPEGX05HilKcCf0JAajBBrQh/Z29qxOAn2VkT4qdYE6w6NYS6XsRAYnj
+    5imeX4cCAwEAAaNCMEAwHQYDVR0OBBYEFH63F8InOIvDxhxybnaf7v6m3Xx1MA8G
+    A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IB
+    AQCZfhITRC7mN5jOgnfX4MA6UuktK7Xo43XT8akBmkwdSi0Xl7eQeH0cqwIQ5RFG
+    O7YIhODKDJBaKy0F5ayO4RxrqpjYit0yXn1BjAOxGB8ciMdee9rQGthqz95HV1xb
+    vzR92JE3qEcLzsmuxbx9Z2TPABU/qMLTz+oiRwGMciBtXnWe798xRX+QvJPHlg7w
+    gv4wm7ViWnYBLgAEmPzOoePq73JlUALJ52OIOdAWgdx7pRTFy+9NVk8D8c7ciNf8
+    /OmwOoxTQpNUvU+DYLtCKpbOsbborZKwJoCy7TMmJPu0kdan2BfaLdpAtT0N1nes
+    2DHNnc0U+xQwW3t6kobIYxfx
+    -----END CERTIFICATE-----
+  authentication:
+    uaa:
+      url: https://10.193.63.131:8443
+      client_id: concourse
+      client_secret: secret
+cf:
+  url: https://api.run.haas-60.pez.pivotal.io
+  root_ca_cert: |
+    -----BEGIN CERTIFICATE-----
+    MIID/DCCAuSgAwIBAgIVAK+Ar0p1Zm6bFJmojfJBVgutJNCpMA0GCSqGSIb3DQEB
+    CwUAMB8xCzAJBgNVBAYTAlVTMRAwDgYDVQQKDAdQaXZvdGFsMB4XDTE3MDgwNDIy
+    NDIwMVoXDTE5MDgwNDIyNDIwMVowRjELMAkGA1UEBhMCVVMxEDAOBgNVBAoMB1Bp
+    dm90YWwxJTAjBgNVBAMMHCoucnVuLmhhYXMtNjAucGV6LnBpdm90YWwuaW8wggEi
+    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDxLa3aIQ9kmYkAXhtsPKDwDfM4
+    Th4wzICBZGsjfBw/Vqt11vWlBT7QvA5LcDcS7hPWakUSmroDhRkMhO13EI+Jug4S
+    N+scVrr7SwNoaMF6yrw+QJallYvzbM8jz4CvRqTYI+RFdDyJh2qTrFYZr7Cc9G7a
+    q+Ul01Zlx+qxIHFT0GsSphXnXVeGM1Tkq+Ymf2GSYnfyElzAP5XaSpVYFOFeG/Gl
+    rvcOSkTVf1Z15IgUymaP5NGUy0IcXtUvu8pTQZu3v9VWNZuhoiGeH7kZV+p2x16/
+    9+j9OFGBk4gX3ya+erPfsguqfIWs4JfHnHSN+o9O9645sV8iKTpwXM7C8y8LAgMB
+    AAGjggEGMIIBAjAOBgNVHQ8BAf8EBAMCB4AwHQYDVR0OBBYEFBVUOOo5LiYww0gy
+    Z8b8U/CzVlCdMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATAfBgNVHSME
+    GDAWgBR+txfCJziLw8Yccm52n+7+pt18dTCBkAYDVR0RBIGIMIGFghwqLnJ1bi5o
+    YWFzLTYwLnBlei5waXZvdGFsLmlvgh8qLmNmYXBwcy5oYWFzLTYwLnBlei5waXZv
+    dGFsLmlvgiIqLmxvZ2luLnJ1bi5oYWFzLTYwLnBlei5waXZvdGFsLmlvgiAqLnVh
+    YS5ydW4uaGFhcy02MC5wZXoucGl2b3RhbC5pbzANBgkqhkiG9w0BAQsFAAOCAQEA
+    U4gXMjXyGOLdiD7F7SCGDOxmtxH17cEXiHxnJucgTGHNs3qW6f62YxN+wKB5gaxJ
+    i1B7ejDtoYoI1DldyIEW15crLdtAH03pzSZFA/S+1f7S2APgoMFcBrhKiPVeEbwt
+    aZIlrJ+w7M/R7BckC909PbbQGtuNZ14ia2/dfdsaEAvLSgGutnvlJCfQRPjmEcGz
+    6J4fkPTRG+OaeP02GymmgLY8D5L9gk5VGEpbV4PN0TKZoHOJ64XpTQKY9dnpWGlx
+    jPao4KiAvda7k90+tXGXIBJQruW9m/P3lvlLkSavSSYA7K4A6Z5KoeWMcIgzoU8a
+    4SRhE8dFw0xIhmqfmRe97Q==
+    -----END CERTIFICATE-----
+  authentication:
+    url: https://uaa.run.haas-60.pez.pivotal.io
+    user_credentials:
+      username: admin
+      password: XP7nnqj-u8xa-BJpcbWojahdzS-YO6Jg
+      #client_id: admin
+      #secret: Xq7oIrHmW3bQPth33aJiHVYusi_GbzgS
+service_adapter:
+  path: ./service_adapter
+service_deployment:
+  releases:
+  - name: concourse
+    version: 3.3.4
+    jobs:
+    - atc
+    - tsa
+    - baggageclaim
+    - groundcrew
+    - postgresql
+  - name: garden-runc
+    version: 1.9.2
+    jobs:
+    - garden
+  stemcell:
+    os: ubuntu-trusty
+    version: 3421.9
+service_catalog:
+  id: D94A086D-203D-4966-A6F1-60A9E2300F72
+  service_name: "concourse-on-demand-service"
+  service_description: "concourse on demand service"
+  bindable: true
+  plan_updatable: true
+  # metadata:
+  #   display_name: "concourse on demand"
+  # global_properties: {}
+  # global_quotas:
+  #   service_instance_limit: 10
+  tags: [concourse]
+  plans:
+  - name: small
+    plan_id: 11789210-D743-4C65-9D38-C80B29F4D9C8
+    description: "small concourse"
+    instance_groups:
+    - name: web
+      vm_type: medium
+      networks:
+      - demand
+      azs:
+      - az1
+      instances: 1
+    - name: db
+      vm_type: medium
+      networks:
+      - demand
+      azs:
+      - az1
+      instances: 1
+      persistent_disk_type: 30720
+    - name: worker
+      vm_type: medium.disk
+      networks:
+      - demand
+      azs:
+      - az1
+      instances: 1
+    properties: {}
+    update:
+      canaries: 1
+      max_in_flight: 2
+      canary_watch_time: "1000-30000"
+      update_watch_time: "1000-30000"
+      serial: true

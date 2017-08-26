@@ -206,7 +206,7 @@ func (m ManifestGenerator) webInstanceProperties(dbPassword string, webPassword 
 		"external_url":        fmt.Sprintf("https://%s.%s", deploymentName, appDomain),
 		"basic_auth_username": "atc",
 		"basic_auth_password": webPassword,
-		"postgresql_database": generateDatabase(dbPassword),
+		"postgresql_database": "atc_db",
 	}
 }
 
