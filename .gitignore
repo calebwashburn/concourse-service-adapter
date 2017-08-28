@@ -2,3 +2,5 @@
 *.a
 *.so
 main
+on-demand-service-broker/broker
+on-demand-service-broker/service_adapter
