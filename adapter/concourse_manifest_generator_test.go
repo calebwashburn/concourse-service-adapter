@@ -33,10 +33,7 @@ var _ = Describe("Concourse Service Adapter", func() {
 
 	BeforeEach(func() {
 		concoursePlan = serviceadapter.Plan{
-			Properties: map[string]interface{}{
-				"cf_deployment": "cfdeployment",
-				"app_domain":    "systemdomain.com",
-			},
+			Properties: map[string]interface{}{},
 			InstanceGroups: []serviceadapter.InstanceGroup{
 				{
 					Name:      "web",
@@ -87,13 +84,6 @@ var _ = Describe("Concourse Service Adapter", func() {
 					adapter.GardenJobName,
 				},
 			},
-			{
-				Name:    adapter.RoutingReleaseName,
-				Version: "9",
-				Jobs: []string{
-					adapter.RouteRegisterJobName,
-				},
-			},
 		}
 
 		stderr = gbytes.NewBuffer()
@@ -123,10 +113,6 @@ var _ = Describe("Concourse Service Adapter", func() {
 				bosh.Release{
 					Name:    "garden-runc",
 					Version: "3",
-				},
-				bosh.Release{
-					Name:    "routing",
-					Version: "9",
 				},
 			}
 
@@ -171,25 +157,9 @@ var _ = Describe("Concourse Service Adapter", func() {
 
 			Expect(generateErr).NotTo(HaveOccurred())
 			Expect(generated.InstanceGroups[0].Name).To(Equal(adapter.WebInstanceName))
-			Expect(len(generated.InstanceGroups[0].Jobs)).To(Equal(3))
 			Expect(generated.InstanceGroups[0].Properties["external_url"]).To(Equal("https://some-instance-id.systemdomain.com"))
-
-			route := generated.InstanceGroups[0].Properties["route_registrar"].(map[string]interface{})["routes"].([]map[string]interface{})[0]
-			Expect(route["name"]).To(Equal("concourse-service"))
-			Expect(route["port"]).To(Equal(8080))
-			Expect(route["registration_interval"]).To(Equal("20s"))
-			Expect(route["uris"].([]string)[0]).To(Equal("some-instance-id.systemdomain.com"))
-
 			Expect(generated.InstanceGroups[0].Jobs[0].Name).To(Equal(adapter.AtcJobName))
 			Expect(generated.InstanceGroups[0].Jobs[1].Name).To(Equal(adapter.TsaJobName))
-
-			expectedNatConsume := map[string]interface{}{
-				"nats": bosh.ConsumesLink{
-					From:       "nats",
-					Deployment: "cfdeployment",
-				},
-			}
-			Expect(generated.InstanceGroups[0].Jobs[2].Consumes).To(Equal(expectedNatConsume))
 		})
 
 		It("sets the concourse db tier instance group", func() {

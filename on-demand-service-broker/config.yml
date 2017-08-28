@@ -81,10 +81,6 @@ service_deployment:
     version: 1.9.2
     jobs:
     - garden
-  - name: routing
-    version: 0.157.3
-    jobs:
-    - route_registrar
   stemcell:
     os: ubuntu-trusty
     version: 3421.9
@@ -127,9 +123,7 @@ service_catalog:
       azs:
       - az1
       instances: 1
-    properties:
-      cf_deployment: cf-6cdac598f0cda3f89657
-      app_domain: cfapps.haas-60.pez.pivotal.io
+    properties: {}
     update:
       canaries: 1
       max_in_flight: 2
