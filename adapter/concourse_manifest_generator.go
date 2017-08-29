@@ -16,6 +16,8 @@ const (
 	ConcourseReleaseName = "concourse"
 	//GardenRuncReleaseName name of the job name
 	GardenRuncReleaseName = "garden-runc"
+	//RoutingReleaseName name of the job name
+	RoutingReleaseName = "routing"
 	//WebInstanceName instance name of web
 	WebInstanceName = "web"
 	//WorkerInstanceName instance name of worker
@@ -34,6 +36,8 @@ const (
 	BaggageClaimJobName = "baggageclaim"
 	//GardenJobName garden job name
 	GardenJobName = "garden"
+	//RouteRegisterJobName route register job name
+	RouteRegisterJobName = "route_registrar"
 )
 
 //CurrentPasswordGenerator Password Generator
@@ -84,7 +88,8 @@ func (m ManifestGenerator) GenerateManifest(
 
 	webInstanceGroup := findInstanceGroup(plan, WebInstanceName)
 	webProperties := m.webInstanceProperties(dbPassword, webPassword, serviceDeployment.DeploymentName, plan.Properties, requestParams.ArbitraryParams(), previousManifest)
-	webJobs, err := gatherJobs(serviceDeployment.Releases, AtcJobName, TsaJobName)
+	webJobs, err := gatherJobs(serviceDeployment.Releases, AtcJobName, TsaJobName, RouteRegisterJobName)
+	webJobs[2].AddCrossDeploymentConsumesLink("nats", "nats", plan.Properties["cf_deployment"].(string))
 	if err != nil {
 		return
 	}
@@ -168,7 +173,7 @@ func gatherJobs(releases serviceadapter.ServiceReleases, jobNames ...string) ([]
 		if err != nil {
 			return nil, err
 		}
-		jobs = append(jobs, bosh.Job{Name: job, Release: release.Name})
+		jobs = append(jobs, bosh.Job{Name: job, Release: release.Name, Consumes: map[string]interface{}{}, Provides: map[string]bosh.ProvidesLink{}})
 	}
 	return jobs, nil
 }
@@ -201,12 +206,21 @@ func findReleaseForJob(requiredJob string, releases serviceadapter.ServiceReleas
 }
 
 func (m ManifestGenerator) webInstanceProperties(dbPassword string, webPassword string, deploymentName string, planProperties serviceadapter.Properties, arbitraryParams map[string]interface{}, previousManifest *bosh.BoshManifest) map[string]interface{} {
-	appDomain := arbitraryParams["app_domain"]
+	appDomain := planProperties["app_domain"]
 	return map[string]interface{}{
 		"external_url":        fmt.Sprintf("https://%s.%s", deploymentName, appDomain),
 		"basic_auth_username": "atc",
 		"basic_auth_password": webPassword,
 		"postgresql_database": "atc_db",
+		"route_registrar": map[string]interface{}{
+			"routes": []map[string]interface{}{{
+				"name":                  "concourse-service",
+				"port":                  8080,
+				"registration_interval": "20s",
+				"uris":                  []string{fmt.Sprintf("%s.%s", deploymentName, appDomain)},
+			},
+			},
+		},
 	}
 }
 

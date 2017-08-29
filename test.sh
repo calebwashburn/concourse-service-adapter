@@ -18,6 +18,13 @@ service_deployment_json=$(jq -n '
         "jobs": [
             "garden"
         ]
+    },
+    {
+        "name": "routing",
+        "version": "1.4.5",
+        "jobs": [
+            "route_registrar"
+        ]
     }
     ],
     "stemcell": {
@@ -66,7 +73,7 @@ plan_json='
       }
    ],
    "properties": {
-      "example": "property"
+      "cf_deployment": "test_deployment"
    },
    "update": {
       "canaries": 1,
