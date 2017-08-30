@@ -1,4 +1,4 @@
-service_deployment_json=$(jq -n '
+service_deployment_json='
 {
     "deployment_name": "service-instance_abcd",
     "releases": [{
@@ -31,8 +31,7 @@ service_deployment_json=$(jq -n '
         "stemcell_os": "BeOS",
         "stemcell_version": "2"
     }
-}
-')
+}'
 
 plan_json='
 {
@@ -73,7 +72,8 @@ plan_json='
       }
    ],
    "properties": {
-      "cf_deployment": "test_deployment"
+      "cf_deployment": "test_deployment",
+      "app_domain": "stuff.com"
    },
    "update": {
       "canaries": 1,
@@ -87,9 +87,6 @@ plan_json='
 
 request_params_json='
 {
-  "parameters": {
-    "app_domain": "appsdomain.com"
-  }
 }
 '
 
